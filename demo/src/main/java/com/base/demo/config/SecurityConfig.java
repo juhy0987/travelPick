@@ -3,12 +3,18 @@ package com.base.demo.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import com.base.demo.filter.CsrfHeaderFilter;
+import com.base.demo.filter.SessionAuthenticationFilter;
+import com.base.demo.security.CustomAuthenticationEntryPoint;
+import com.base.demo.service.UserService;
 
 @Configuration
 public class SecurityConfig{
@@ -22,15 +28,22 @@ public class SecurityConfig{
         "/swagger-ui/**", 
         "/swagger-ui.html").permitAll()
         .requestMatchers(
-        "/*/auth/login").permitAll()
-        .requestMatchers(
-          "/api/v1/auth/register").permitAll()
+        "/api/*/auth/login",
+        "/api/*/auth/register").permitAll()
         .anyRequest().authenticated()
       )
       // .csrf(csrf -> csrf
       //   .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
       // .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
       .csrf().disable()
+      .sessionManagement(sessionManagement -> 
+        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+      )
+      .addFilterBefore(new SessionAuthenticationFilter(userDetailsService()), 
+      UsernamePasswordAuthenticationFilter.class)
+      .exceptionHandling(exceptionHandling ->
+        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint())
+      )
       .formLogin((formLogin) ->
       formLogin
         .usernameParameter("email")
@@ -49,5 +62,15 @@ public class SecurityConfig{
   @Bean
   public CsrfHeaderFilter csrfHeaderFilter() {
     return new CsrfHeaderFilter();
+  }
+
+  @Bean
+  public UserDetailsService userDetailsService() {
+    return new UserService();
+  }
+
+  @Bean
+  public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+    return new CustomAuthenticationEntryPoint();
   }
 }
