@@ -3,8 +3,8 @@ package com.base.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,17 +25,12 @@ public class AuthenticationController {
   @Autowired
   private UserService userService;
 
-  @PostMapping("/login")
+  @PostMapping("")
   public ResponseEntity<String> login(
     @RequestBody LoginDto loginDto,
     HttpSession session) {
-    try {
-      System.out.println("Logging in user");
-      User user = userService.authenticate(loginDto);
-      session.setAttribute("user", user);
-    } catch (AuthenticationException e) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
-    }
+    User user = userService.authenticate(loginDto);
+    session.setAttribute("user", user);
     
     return ResponseEntity.status(HttpStatus.OK).body("Login successful");
   }
@@ -44,23 +39,29 @@ public class AuthenticationController {
   public ResponseEntity<String> register(
     @RequestBody RegisterDto registerDto,
     HttpSession session) {
-    try {
-      System.out.println("Registering user");
-      log.info(registerDto.toString());
-      User user = userService.register(registerDto);
-      session.setAttribute("user", user);
-    } catch (AuthenticationException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed");
-    } catch (Exception e) {
-      System.out.println(e.toString());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed");
-    }
-    System.out.println("Registration successful");
+    User user = userService.register(registerDto);
+    session.setAttribute("user", user);
+    
     return ResponseEntity.status(HttpStatus.CREATED).body("Registration successful");
   }
 
-  @ExceptionHandler(Exception.class)
-  public String globalExceptionHandler(Exception e) {
-    return "error";
+  @GetMapping("")
+  public ResponseEntity<String> check(HttpSession session) {
+    return ResponseEntity.status(HttpStatus.OK).body("Authorized");
+  }
+
+  @DeleteMapping("")
+  public ResponseEntity<String> logout(HttpSession session) {
+    session.invalidate();
+    return ResponseEntity.status(HttpStatus.OK).body("Logged out");
+  }
+
+  @DeleteMapping("/delete")
+  public ResponseEntity<String> delete(HttpSession session) {
+    User user = (User) session.getAttribute("user");
+    
+    userService.delete(user);
+    session.invalidate();
+    return ResponseEntity.status(HttpStatus.OK).body("User deleted");
   }
 }
