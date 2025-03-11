@@ -1,3 +1,4 @@
+.env
 # Python temporary files
 *.pyc
 *.pyo
