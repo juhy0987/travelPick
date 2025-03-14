@@ -6,7 +6,7 @@ import torch
 import chromadb
 
 from lib import utils
-from .models import clip, blip
+from .models import clip, blip, gemma
 
 class VectorModel:
   _models = {}
@@ -18,12 +18,15 @@ class VectorModel:
   
   def __init__(self, model_name, model_type):
     self.model_name = model_name
-    if model_type == "clip":
-      self.model = clip.CLIP(model_name)
-    elif model_type == "blip":
-      self.model = blip.BLIP(model_name)
-    else:
-      raise ValueError("Invalid model type.")
+    match model_type:
+      case "clip":
+        self.model = clip.CLIP(model_name)
+      case "blip":
+        self.model = blip.BLIP(model_name)
+      case "gemma":
+        self.model = gemma.GEMMA(model_name)
+      case _:
+        raise ValueError("Invalid model type.")
   
   def encode(self, *args, **kwargs):
     return self.model.encode(*args, **kwargs)
@@ -43,16 +46,24 @@ class VectorStore:
     
     self.collection = self.client.create_collection(collection_name, get_or_create=True)
   
-  def store(self, objs=[], metas=[]):
+  def store(self, objs=[], metas=[], func=None):
     if not objs:
-      return []
+      return [], []
     if len(objs) != len(metas):
       raise ValueError("Length of objs and metas must be the same.")
     
-    embeds, docs, metadatas = self.model.encode(objs=objs, metas=metas)
+    texts = None
+    images = None
     
-    if not embeds.all():
-      return []
+    if isinstance(objs[0], str):
+      texts = objs
+    elif isinstance(objs[0], Image.Image):
+      images = objs
+    else:
+      raise ValueError("Invalid object type.")
+      
+    embeds, docs = self.model.encode(texts=texts, images=images)
+    metadatas = metas
     
     self.collection.add(
       documents=docs,
@@ -67,7 +78,7 @@ class VectorStore:
     if not query:
       return []
     
-    query_embed, _, _ = self.model.encode(objs=[query], flag=True)
+    query_embed, _, _ = self.model.encode(objs=[query])
     results = self.collection.query(query_embeddings=query_embed, 
                                     n_results=n)
     return results if results else []

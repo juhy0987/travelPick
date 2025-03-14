@@ -9,12 +9,16 @@ from lib import utils
 
 class CLIP:
   def __init__(self, model_name):
+    self.model_name = model_name
     self.processor = None
     self.model = None
     self.device = "cuda" if torch.cuda.is_available() else "cpu"
     
+    self.load()
+  
+  def load(self):
     model_dir = os.getenv("MODEL_CACHE_DIR")
-    model_dir = f"{model_dir}/{model_name}"
+    model_dir = f"{model_dir}/{self.model_name}"
     if not os.path.exists(model_dir):
       os.makedirs(model_dir)
     
@@ -23,52 +27,16 @@ class CLIP:
       self.model = CLIPModel.from_pretrained(model_dir).to(self.device)
       
     else:
-      self.processor = CLIPProcessor.from_pretrained(model_name)
-      self.model = CLIPModel.from_pretrained(model_name).to(self.device)
+      self.processor = CLIPProcessor.from_pretrained(self.model_name)
+      self.model = CLIPModel.from_pretrained(self.model_name).to(self.device)
       self.processor.save_pretrained(model_dir)
       self.model.save_pretrained(model_dir)
   
-  def encode(self, *args, **kwargs):
-    objs = kwargs.get("objs", [])
-    metas = kwargs.get("metas", [])
+  def encode(self, texts=None, images=None):
+    if not texts and not images:
+      return np.ndarray(), []
     
-    if not objs:
-      return []
-    
-    if kwargs.get("flag") == True:
-      return self._encode(texts=objs), [], []
-    
-    texts, text_metas, images, image_metas = [], [], [], []
-    for obj, meta in zip(objs, metas):
-      if isinstance(obj, str):
-        meta["source"] = "text"
-        texts.append(obj)
-        text_metas.append(meta)
-      elif isinstance(obj, Image.Image):
-        meta["source"] = "image"
-        images.append(obj)
-        image_metas.append(meta)
-    
-    if texts and images:
-      return (
-        self._encode(texts=texts, images=images), 
-        texts+[utils.image_to_base64(img) for img in images], 
-        text_metas+image_metas
-      )
-    elif texts:
-      return (
-        self._encode(texts=texts), 
-        texts, 
-        text_metas
-      )
-    elif images:
-      return (
-        self._encode(images=images), 
-        [utils.image_to_base64(img) for img in images], 
-        image_metas
-      )
-    else:
-      return [], [], []
+    return self._encode(texts=texts, images=images)
   
   def _encode(self, texts=None, images=None):
     
@@ -89,4 +57,4 @@ class CLIP:
           pixel_values=inputs["pixel_values"]
         ).cpu().numpy())
     
-    return np.concatenate([result for result in results if result is not None], axis=0)
+    return results[0], texts if texts else [utils.image_to_base64(img) for img in images]
