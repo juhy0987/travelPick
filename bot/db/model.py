@@ -73,7 +73,6 @@ class Photo(Base):
   review_id = Column(String(36), ForeignKey('review.id'), nullable=True)
   data = Column(LargeBinary, nullable=False)
   score = Column(Double, nullable=False)
-  description = Column(String, nullable=True)
   
   Index('location_id', 'review_id')
   
