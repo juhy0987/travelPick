@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.base.demo.dto.AutoCompleteDto;
+import com.base.demo.dto.LocationDto;
 import com.base.demo.entity.Photo;
 import com.base.demo.entity.Resort;
 import com.base.demo.repository.LocationRepository;
@@ -37,7 +38,9 @@ public class ResortService {
       return null;
     }
 
-    return resort;
+    List<LocationDto> ancestors = this.getAncestors();
+
+    return resort.toResortDto(ancestors, photos);
   }
 
   public List<AutoCompleteDto> autoComplete(String query) {
@@ -45,9 +48,7 @@ public class ResortService {
     return resorts.stream()
       .map(resort -> {
         List<Photo> tmp = photoRepository.findByLocationID(resort.getId());
-        return new AutoCompleteDto(
-          resort.getId().toString(),
-          resort.getName(),
+        return resort.toAutoCompleteDto(
           fuzzyScore.fuzzyScore(resort.getName(), query),
           tmp.isEmpty() ? "" : tmp.get(random.nextInt(tmp.size())).getThumbnail()
         );
@@ -56,4 +57,6 @@ public class ResortService {
       .sorted((r1, r2) -> Integer.compare(r1.getSimilarity(), r2.getSimilarity()))
       .collect(Collectors.toList());
   }
+
+  
 }
