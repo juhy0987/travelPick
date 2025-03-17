@@ -1,6 +1,11 @@
 package com.base.demo.entity;
 
+import java.util.List;
 import java.util.UUID;
+
+import com.base.demo.dto.AutoCompleteDto;
+import com.base.demo.dto.LocationDto;
+import com.base.demo.dto.ResortDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,4 +43,23 @@ public class Resort {
 
   @Column
   private String description;
+
+  public ResortDto toResortDto(List<LocationDto> ancestors, List<String> photos) {
+    return new ResortDto(
+      id,
+      name,
+      description,
+      ancestors,
+      photos
+    );
+  }
+
+  public AutoCompleteDto toAutoCompleteDto(Integer similarity, String thumbnail) {
+    return new AutoCompleteDto(
+      id, 
+      name,
+      similarity,
+      thumbnail
+    );
+  }
 }
