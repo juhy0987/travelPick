@@ -6,7 +6,7 @@ import torch
 import chromadb
 
 from lib import utils
-from .models import clip, blip, gemma
+from .models import clip, blip, gemma, longformer
 
 class VectorModel:
   _models = {}
@@ -25,6 +25,8 @@ class VectorModel:
         self.model = blip.BLIP(model_name)
       case "gemma":
         self.model = gemma.GEMMA(model_name)
+      case "longformer":
+        self.model = longformer.Longformer(model_name)
       case _:
         raise ValueError("Invalid model type.")
   
@@ -46,21 +48,22 @@ class VectorStore:
     
     self.collection = self.client.create_collection(collection_name, get_or_create=True)
   
-  def store(self, objs=[], metas=[], func=None):
-    if not objs:
-      return [], []
-    if len(objs) != len(metas):
-      raise ValueError("Length of objs and metas must be the same.")
+  # def store(self, objs=[], metas=[], func=None):
+  def store(self, texts=None, images=None, metas=[], func=None):
+    # if not objs:
+    #   return [], []
+    # if len(objs) != len(metas):
+    #   raise ValueError("Length of objs and metas must be the same.")
     
-    texts = None
-    images = None
+    # texts = None
+    # images = None
     
-    if isinstance(objs[0], str):
-      texts = objs
-    elif isinstance(objs[0], Image.Image):
-      images = objs
-    else:
-      raise ValueError("Invalid object type.")
+    # if isinstance(objs[0], str):
+    #   texts = objs
+    # elif isinstance(objs[0], Image.Image):
+    #   images = objs
+    # else:
+    #   raise ValueError("Invalid object type.")
       
     embeds, docs = self.model.encode(texts=texts, images=images)
     metadatas = metas
@@ -78,7 +81,7 @@ class VectorStore:
     if not query:
       return []
     
-    query_embed, _, _ = self.model.encode(objs=[query])
+    query_embed, _, = self.model.encode(texts=[query])
     results = self.collection.query(query_embeddings=query_embed, 
                                     n_results=n)
     return results if results else []
