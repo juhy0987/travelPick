@@ -8,6 +8,7 @@ __pycache__/
 *.swo
 *.bak
 *.tmp
+test*.py
 
 test/
 resources/
