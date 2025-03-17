@@ -1,5 +1,7 @@
 package com.base.demo.dto;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AutoCompleteDto {
-  private String id;
+  private UUID id;
   private String name;
   private Integer similarity;
   private String thumbnail;
