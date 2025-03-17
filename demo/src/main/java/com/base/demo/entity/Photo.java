@@ -38,8 +38,12 @@ public class Photo {
   private byte[] data;
 
   @Column(nullable = false)
-  private String description;
+  private Float score;
 
   @Column(nullable = false)
-  private Float score;
+  private String ext;
+
+  public String getThumbnail() {
+    return "data:image/" + ext + ";base64," + new String(data);
+  }
 }
