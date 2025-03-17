@@ -27,8 +27,8 @@ public class Photo {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "location_id")
-  private Location location;
+  @JoinColumn(name = "resort_id")
+  private Resort resort;
   
   @ManyToOne
   @JoinColumn(name = "review_id")
