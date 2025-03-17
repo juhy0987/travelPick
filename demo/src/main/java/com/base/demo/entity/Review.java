@@ -30,8 +30,8 @@ public class Review {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "location_id")
-  private Location location;
+  @JoinColumn(name = "resort_id")
+  private Resort resort;
 
   @ManyToOne
   @JoinColumn(name = "user_id")

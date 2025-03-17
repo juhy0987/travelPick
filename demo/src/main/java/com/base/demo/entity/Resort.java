@@ -27,12 +27,8 @@ public class Resort {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name="parent_id")
-  private Resort parent;
-
-  @ManyToOne
-  @JoinColumn(name="parent_location_id")
-  private Location parentLocation;
+  @JoinColumn(name="location_id")
+  private Location location;
 
   @Column(nullable=false)
   private String name;
@@ -42,7 +38,4 @@ public class Resort {
 
   @Column
   private String description;
-
-  @Column
-  private Float score;
 }

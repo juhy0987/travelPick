@@ -32,10 +32,6 @@ public class Location {
   @JoinColumn(name="parent_id")
   private Location parent;
 
-  @ManyToOne
-  @JoinColumn(name="resort_id")
-  private Resort resort;
-
   @Column(nullable=false)
   private String name;
 
@@ -47,7 +43,4 @@ public class Location {
 
   @Column(nullable=false)
   private Integer timezone;
-
-  @Column(nullable=false)
-  private Float score;
 }
