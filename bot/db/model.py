@@ -17,7 +17,7 @@ class User(Base):
   refresh_token = Column(String(255), nullable=True)
   created = Column(DateTime, nullable=False)
   
-  review = relationship('review', back_populates='user')
+  review = relationship('Review', back_populates='user')
 
 class Location(Base):
   __tablename__ = 'location'
@@ -31,7 +31,8 @@ class Location(Base):
   
   Index('parent_id', 'name')
 
-  photo = relationship('photo', back_populates='location')
+  photo = relationship('Photo', back_populates='location')
+  resort = relationship('Resort', back_populates='location')
   
 class Resort(Base):
   __tablename__ = 'resort'
@@ -44,7 +45,8 @@ class Resort(Base):
   
   Index('location_id', 'name')
   
-  location = relationship('location', back_populates='resort')
+  location = relationship('Location', back_populates='resort')
+  review = relationship('Review', back_populates='resort')
   
 class Review(Base):
   __tablename__ = 'review'
@@ -59,8 +61,9 @@ class Review(Base):
   
   Index('resort_id')
   
-  resort = relationship('resort', back_populates='review')
-  user = relationship('user', back_populates='review')
+  resort = relationship('Resort', back_populates='review')
+  user = relationship('User', back_populates='review')
+  photo = relationship('Photo', back_populates='review')
   
 class Photo(Base):
   __tablename__ = 'photo'
@@ -74,5 +77,5 @@ class Photo(Base):
   
   Index('location_id', 'review_id')
   
-  location = relationship('location', back_populates='photo')
-  review = relationship('review', back_populates='photo')
+  location = relationship('Location', back_populates='photo')
+  review = relationship('Review', back_populates='photo')
