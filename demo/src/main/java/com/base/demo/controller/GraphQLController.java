@@ -47,8 +47,6 @@ public class GraphQLController {
 
   @QueryMapping
   public List<AutoCompleteDto> autoComplete(@Argument String query) {
-    List<AutoCompleteDto> tmp = resortService.autoComplete(query);
-    System.out.println(tmp);
-    return tmp;
+    return resortService.autoComplete(query);
   }
 }
