@@ -31,7 +31,6 @@ class Location(Base):
   
   Index('parent_id', 'name')
 
-  photo = relationship('Photo', back_populates='location')
   resort = relationship('Resort', back_populates='location')
   
 class Resort(Base):
@@ -47,6 +46,7 @@ class Resort(Base):
   
   location = relationship('Location', back_populates='resort')
   review = relationship('Review', back_populates='resort')
+  photo = relationship('Photo', back_populates='resort')
   
 class Review(Base):
   __tablename__ = 'review'
@@ -69,12 +69,12 @@ class Photo(Base):
   __tablename__ = 'photo'
   
   id = Column(String(36), primary_key=True, default=uuid.uuid4)
-  location_id = Column(String(36), ForeignKey('location.id'), nullable=True)
+  resort_id = Column(String(36), ForeignKey('resort.id'), nullable=True)
   review_id = Column(String(36), ForeignKey('review.id'), nullable=True)
   data = Column(LargeBinary, nullable=False)
   score = Column(Double, nullable=False)
   
-  Index('location_id', 'review_id')
+  Index('resort_id', 'review_id')
   
-  location = relationship('Location', back_populates='photo')
+  resort = relationship('Resort', back_populates='photo')
   review = relationship('Review', back_populates='photo')
