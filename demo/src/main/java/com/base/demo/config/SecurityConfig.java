@@ -30,6 +30,10 @@ public class SecurityConfig{
         .requestMatchers(
         "/api/*/auth/login",
         "/api/*/auth/register").permitAll()
+        .requestMatchers(
+          "/graphiql",
+          "/graphql"
+        ).permitAll()
         .anyRequest().authenticated()
       )
       // .csrf(csrf -> csrf
