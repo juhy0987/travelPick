@@ -1,11 +1,11 @@
 type Query {
   hello: String
-  autoComplete(query: String!): [Resort]
+  autoComplete(query: String!): [AutoCompleteDto]
 }
 
 type AutoCompleteDto {
   id: String!
   name: String!
-  similarity: Double!
+  similarity: Int !
   thumbnail: String
 }
