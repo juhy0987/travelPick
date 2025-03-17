@@ -53,8 +53,8 @@ class CLIP:
         ).cpu().numpy())
       
       if inputs.get("pixel_values") is not None:
-        results.append(self.model.get_image_features(
+        results = [(self.model.get_image_features(
           pixel_values=inputs["pixel_values"]
-        ).cpu().numpy())
+        ).cpu().numpy())]
     
-    return results[0], texts if texts else [utils.image_to_base64(img) for img in images]
+    return results[0], [utils.image_to_base64(img) for img in images] if images else texts
