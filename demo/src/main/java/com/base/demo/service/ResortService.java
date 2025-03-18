@@ -1,8 +1,10 @@
 package com.base.demo.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.text.similarity.FuzzyScore;
@@ -11,12 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.base.demo.dto.AutoCompleteDto;
+import com.base.demo.dto.PhotoDto;
 import com.base.demo.dto.ResortDto;
 import com.base.demo.entity.Photo;
 import com.base.demo.entity.Resort;
 import com.base.demo.repository.LocationRepository;
 import com.base.demo.repository.PhotoRepository;
 import com.base.demo.repository.ResortRepository;
+import com.base.demo.utils.ImageSize;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +36,9 @@ public class ResortService {
 
   @Value("${app.similarity.minimum}")
   private int minimumSimilarity;
+
+  @Value("${app.default.thumbnail.num}")
+  private int defaultThumbnailNum;
  
   private final FuzzyScore fuzzyScore = new FuzzyScore(java.util.Locale.KOREAN);
   private final Random random = new Random();
@@ -41,10 +48,15 @@ public class ResortService {
     if (resort == null) {
       return null;
     }
-    List<String> photos = photoRepository.findAllByResortID(id).stream()
-      .map(Photo::getDataURL)
+    List<Photo> photos = photoRepository.findAllByResortID(id);
+    AtomicInteger index = new AtomicInteger(0);
+    Collections.shuffle(photos);
+    
+    List<PhotoDto> photoDtos = photos.stream()
+      .limit(defaultThumbnailNum)
+      .map(photo -> photo.toPhotoDto(index.getAndIncrement(), ImageSize.THUMBNAIL))
       .collect(Collectors.toList());
-    return resort.toResortDto(photos);
+    return resort.toResortDto(photoDtos);
   }
 
   public List<AutoCompleteDto> autoComplete(String query) {

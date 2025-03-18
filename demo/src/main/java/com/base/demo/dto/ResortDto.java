@@ -17,5 +17,5 @@ public class ResortDto {
   private String name;
   private String description;
   private LocationDto ancestor;
-  private List<String> photos;
+  private List<PhotoDto> photos;
 }

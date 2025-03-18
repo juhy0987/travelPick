@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.base.demo.dto.AutoCompleteDto;
+import com.base.demo.dto.PhotoDto;
 import com.base.demo.dto.ResortDto;
 
 import jakarta.persistence.Column;
@@ -43,7 +44,7 @@ public class Resort {
   @Column
   private String description;
 
-  public ResortDto toResortDto(List<String> photos) {
+  public ResortDto toResortDto(List<PhotoDto> photos) {
     return new ResortDto(
       id,
       name,
