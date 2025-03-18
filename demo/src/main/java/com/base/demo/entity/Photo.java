@@ -1,6 +1,16 @@
 package com.base.demo.entity;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
+
+import com.base.demo.dto.PhotoDto;
+import com.base.demo.utils.ImageSize;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +53,41 @@ public class Photo {
   @Column(nullable = false)
   private String ext;
 
-  public String getThumbnail() {
-    return "data:image/" + ext + ";base64," + new String(data);
+  public String getDataURL(ImageSize size) {
+    return "data:image/" + ext + ";base64," + new String(resizeImage(size));
+  }
+
+  public String getDataURL() {
+    return getDataURL(ImageSize.THUMBNAIL);
+  }
+
+  public byte[] resizeImage(ImageSize size) {
+    try {
+      ByteArrayInputStream bais = new ByteArrayInputStream(data);
+      BufferedImage originalImage = ImageIO.read(bais);
+      BufferedImage resizedImage = new BufferedImage(size.width(), size.height(), originalImage.getType());
+      Graphics2D g = resizedImage.createGraphics();
+      g.drawImage(originalImage, 0, 0, size.width(), size.height(), null);
+      g.dispose();
+  
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ImageIO.write(resizedImage, ext, baos);
+      return baos.toByteArray();
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public byte[] resizeImage(){
+    return resizeImage(ImageSize.THUMBNAIL);
+  }
+
+  public PhotoDto toPhotoDto(Integer index, ImageSize size) {
+    return new PhotoDto(id, getDataURL(size), index);
+  }
+
+  public PhotoDto toPhotoDto(Integer index) {
+    return new PhotoDto(id, getDataURL(ImageSize.FULL), index);
   }
 }

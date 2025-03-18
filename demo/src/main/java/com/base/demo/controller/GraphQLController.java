@@ -9,7 +9,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import com.base.demo.dto.AutoCompleteDto;
-import com.base.demo.entity.Resort;
+import com.base.demo.dto.ResortDto;
 import com.base.demo.service.PhotoService;
 import com.base.demo.service.ResortService;
 import com.base.demo.service.ReviewService;
@@ -35,9 +35,8 @@ public class GraphQLController {
   }
 
   @QueryMapping
-  public Resort getResort(UUID id) {
-    Resort resort = resortService.getResort(id);
-    return resort;
+  public ResortDto getResort(UUID id) {
+    return resortService.getResortDto(id);
   }
 
   // @QueryMapping
