@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.springframework.data.geo.Point;
 
+import com.base.demo.dto.LocationDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,5 +44,15 @@ public class Location {
   private Point coordinates;
 
   @Column(nullable=false)
-  private Integer timezone;
+  private String timezone;
+
+  public LocationDto toLocationDto() {
+    return new LocationDto(
+      id,
+      name,
+      coordinates,
+      timezone,
+      parent != null ? parent.toLocationDto() : null
+    );
+  }
 }

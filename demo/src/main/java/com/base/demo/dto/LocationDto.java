@@ -1,7 +1,8 @@
 package com.base.demo.dto;
 
-import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.geo.Point;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ResortDto {
+public class LocationDto {
   private UUID id;
   private String name;
-  private String description;
-  private LocationDto ancestor;
-  private List<String> photos;
+  private Point coordinates;
+  private String timezone;
+  private LocationDto parent;
 }
