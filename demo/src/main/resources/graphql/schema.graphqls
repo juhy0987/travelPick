@@ -9,3 +9,24 @@ type AutoCompleteDto {
   similarity: Int !
   thumbnail: String
 }
+
+type ResortDto {
+  id: String!
+  name: String!
+  description: String
+  ancestor: LocationDto
+  photos: [String]
+}
+
+type LocationDto {
+  id: String!
+  name: String!
+  coordinates: Point!
+  timezone: String
+  parent: LocationDto
+}
+
+type Point {
+  latitude: Float!
+  longitude: Float!
+}
