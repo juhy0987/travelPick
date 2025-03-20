@@ -28,6 +28,7 @@ public class UserDto {
       this.passHash,
       this.name, 
       this.refreshToken, 
-      this.created);
+      this.created
+    );
   }
 }
