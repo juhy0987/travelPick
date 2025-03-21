@@ -1,7 +1,11 @@
 package com.base.demo.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
+
+import com.base.demo.dto.PhotoDto;
+import com.base.demo.dto.ReviewDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,13 +44,41 @@ public class Review {
   @Column
   private String content;
 
-  @Column(nullable=false)
+  @Column(nullable=true)
   private Float score;
 
-  @Column(nullable=false)
+  @Column(nullable=true)
   private Timestamp created;
 
-  @Column(nullable=false,
+  @Column(nullable=true,
           columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
   private Timestamp updated;
+
+  public ReviewDto toReviewDto(List<PhotoDto> photos) {
+    return new ReviewDto(
+      this.id,
+      this.resort.getId(),
+      this.user.getEmail(),
+      this.content,
+      this.created,
+      this.updated,
+      photos
+    );
+  }
+
+  public void update(Review review) {
+    boolean flag = false;
+    if (review.getContent() != null) {
+      this.content = review.getContent();
+      flag = true;
+    }
+    if (review.getScore() != null) {
+      this.score = review.getScore();
+      flag = true;
+    }
+    
+    if (flag) {
+      this.updated = new Timestamp(System.currentTimeMillis());
+    }
+  }
 }
