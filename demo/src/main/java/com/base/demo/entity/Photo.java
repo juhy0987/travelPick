@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -53,12 +54,16 @@ public class Photo {
   @Column(nullable = false)
   private String ext;
 
+  @Column(nullable = false)
+  private Timestamp created;
+
   public Photo(Resort resort, Review review, String dataturl) {
     String[] parts = dataturl.split(",");
     this.ext = parts[0].split("/")[1].split(";")[0];
     this.data = java.util.Base64.getDecoder().decode(parts[1]);
     this.resort = resort;
     this.review = review;
+    this.created = new Timestamp(System.currentTimeMillis());
   }
 
   public String getDataURL(ImageSize size) {
