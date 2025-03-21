@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.base.demo.dto.PhotoDto;
+import com.base.demo.dto.PhotoGetDto;
 import com.base.demo.entity.Photo;
 import com.base.demo.repository.PhotoRepository;
 
@@ -28,12 +29,12 @@ public class PhotoService {
     return target.toPhotoDto(0);
   }
 
-  public List<PhotoDto> getPhotos(UUID resort_id, int offset, int limit) {
-    List<Photo> photos = photoRepository.findAllByResortID(resort_id);
-    AtomicInteger index = new AtomicInteger(offset);
+  public List<PhotoDto> getPhotos(PhotoGetDto photoGetDto) {
+    List<Photo> photos = photoRepository.findAllByResortID(photoGetDto.getResort_id());
+    AtomicInteger index = new AtomicInteger(photoGetDto.getOffset());
     return photos.stream()
-      .skip(offset)
-      .limit(limit)
+      .skip(photoGetDto.getOffset())
+      .limit(photoGetDto.getLimit())
       .map(photo -> photo.toPhotoDto(index.getAndIncrement()))
       .collect(Collectors.toList());
   }
