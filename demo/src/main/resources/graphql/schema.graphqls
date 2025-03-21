@@ -12,6 +12,9 @@ type Query {
   getPhotos(resort_id: UUID!, offset: Int!, limit: Int): [PhotoDto]
 
   getReview(id: UUID!): ReviewDto
+  createReview(reviewRegisterDto: ReviewRegisterDto!): ReviewDto
+  updateReview(reviewUpdateDto: ReviewUpdateDto!): ReviewDto
+  deleteReview(id: UUID!): String
 }
 
 type Mutation {
@@ -19,14 +22,14 @@ type Mutation {
 }
 
 type AutoCompleteDto {
-  id: String!
+  id: UUID!
   name: String!
   similarity: Int !
   thumbnail: String
 }
 
 type LocationDto {
-  id: String!
+  id: UUID!
   name: String!
   coordinates: Point!
   timezone: String
@@ -34,7 +37,7 @@ type LocationDto {
 }
 
 type ResortDto {
-  id: String!
+  id: UUID!
   name: String!
   description: String
   ancestor: LocationDto
@@ -42,8 +45,8 @@ type ResortDto {
 }
 
 type ReviewDto {
-  id: String!
-  resort_id: String
+  id: UUID!
+  resort_id: UUID
   user_id: String
   content: String
   created: Date
@@ -52,7 +55,7 @@ type ReviewDto {
 }
 
 type PhotoDto {
-  id: String!
+  id: UUID!
   dataurl: String!
   index: Int!
 }
@@ -78,4 +81,11 @@ input ReviewRegisterDto {
   resort_id: UUID!
   content: String!
   photos: [String]
+}
+
+input ReviewUpdateDto {
+  id: UUID!
+  content: String
+  delete_photos: [UUID]
+  add_photos: [String]
 }
