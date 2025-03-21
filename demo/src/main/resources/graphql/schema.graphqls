@@ -1,6 +1,21 @@
+scalar UUID
+scalar Date
+
 type Query {
   hello: String
+
+  getResort(id: UUID!): ResortDto
+  searchResorts(searchDto: SearchDto!): [ResortDto]
   autoComplete(query: String!): [AutoCompleteDto]
+
+  getPhoto(id: UUID!): PhotoDto
+  getPhotos(resort_id: UUID!, offset: Int!, limit: Int): [PhotoDto]
+
+  getReview(id: UUID!): ReviewDto
+}
+
+type Mutation {
+  createReview(reviewDto: ReviewRegisterDto): ReviewDto
 }
 
 type AutoCompleteDto {
@@ -8,14 +23,6 @@ type AutoCompleteDto {
   name: String!
   similarity: Int !
   thumbnail: String
-}
-
-type ResortDto {
-  id: String!
-  name: String!
-  description: String
-  ancestor: LocationDto
-  photos: [String]
 }
 
 type LocationDto {
@@ -26,7 +33,49 @@ type LocationDto {
   parent: LocationDto
 }
 
+type ResortDto {
+  id: String!
+  name: String!
+  description: String
+  ancestor: LocationDto
+  photos: [PhotoDto]
+}
+
+type ReviewDto {
+  id: String!
+  resort_id: String
+  user_id: String
+  content: String
+  created: Date
+  updated: Date
+  photos: [PhotoDto]
+}
+
+type PhotoDto {
+  id: String!
+  dataurl: String!
+  index: Int!
+}
+
 type Point {
   latitude: Float!
   longitude: Float!
+}
+
+
+input SearchDto {
+  query: String
+  dataurls: [String]
+}
+
+input PhotoGetDto {
+  resort_id: UUID!
+  offset: Int!
+  limit: Int
+}
+
+input ReviewRegisterDto {
+  resort_id: UUID!
+  content: String!
+  photos: [String]
 }
