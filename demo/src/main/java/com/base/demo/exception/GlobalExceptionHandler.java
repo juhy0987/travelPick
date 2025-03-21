@@ -1,5 +1,7 @@
 package com.base.demo.exception;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Hidden
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
   
   @ExceptionHandler(AuthenticationException.class)
@@ -27,6 +30,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
+  }
+
+  @ExceptionHandler(NullPointerException.class)
+  public ResponseEntity<String> nullPointerExceptionHandler(NullPointerException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
   }
 
