@@ -118,6 +118,11 @@
         <artifactId>commons-text</artifactId>
         <version>1.9</version>
     </dependency>
+		<dependency>
+			<groupId>com.graphql-java</groupId>
+			<artifactId>graphql-java-extended-scalars</artifactId>
+			<version>19.0</version>
+		</dependency>
 </dependencies>
 
 	<build>
