@@ -122,7 +122,7 @@ public class ReviewService {
     );
   }
 
-  public void delete(UUID id, UserDetails userDetails) {
+  public String delete(UUID id, UserDetails userDetails) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     if (user == null) {
       throw new AuthenticationException("User not found") {};
@@ -137,5 +137,6 @@ public class ReviewService {
     }
     
     reviewRepository.delete(review);
+    return "Review deleted";
   }
 }

@@ -83,8 +83,8 @@ public class GraphQLController {
   }
 
   @MutationMapping
-  public ReviewDto createReview(@Argument ReviewRegisterDto reviewDto, @AuthenticationPrincipal UserDetails userDetails) {
-    return reviewService.createReview(reviewDto, userDetails);
+  public ReviewDto createReview(@Argument ReviewRegisterDto reviewRegisterDto, @AuthenticationPrincipal UserDetails userDetails) {
+    return reviewService.createReview(reviewRegisterDto, userDetails);
   }
 
   @MutationMapping
@@ -93,7 +93,7 @@ public class GraphQLController {
   }
 
   @QueryMapping
-  public void deleteReview(@Argument UUID id, @AuthenticationPrincipal UserDetails userDetails) {
-    reviewService.delete(id, userDetails);
+  public String deleteReview(@Argument UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+    return reviewService.delete(id, userDetails);
   }
 }
