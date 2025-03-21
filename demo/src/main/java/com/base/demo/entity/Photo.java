@@ -53,6 +53,14 @@ public class Photo {
   @Column(nullable = false)
   private String ext;
 
+  public Photo(Resort resort, Review review, String dataturl) {
+    String[] parts = dataturl.split(",");
+    this.ext = parts[0].split("/")[1].split(";")[0];
+    this.data = java.util.Base64.getDecoder().decode(parts[1]);
+    this.resort = resort;
+    this.review = review;
+  }
+
   public String getDataURL(ImageSize size) {
     return "data:image/" + ext + ";base64," + new String(resizeImage(size));
   }
