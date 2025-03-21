@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.base.demo.dto.LoginDto;
-import com.base.demo.dto.RegisterDto;
+import com.base.demo.dto.UserRegisterDto;
 import com.base.demo.entity.User;
 import com.base.demo.service.UserService;
 
@@ -37,7 +37,7 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public ResponseEntity<String> register(
-    @RequestBody RegisterDto registerDto,
+    @RequestBody UserRegisterDto registerDto,
     HttpSession session) {
     User user = userService.register(registerDto);
     session.setAttribute("user", user);

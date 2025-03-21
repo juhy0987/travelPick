@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.base.demo.dto.LoginDto;
-import com.base.demo.dto.RegisterDto;
+import com.base.demo.dto.UserRegisterDto;
 import com.base.demo.entity.User;
 import com.base.demo.exception.UserAlreadyExistsException;
 import com.base.demo.repository.UserRepository;
@@ -48,7 +48,7 @@ public class UserService implements UserDetailsService{
   }
 
   @Transactional
-  public User register(RegisterDto registerDto) {
+  public User register(UserRegisterDto registerDto) {
     if (registerDto.getEmail() == null || registerDto.getEmail().isEmpty()
       || registerDto.getPassword() == null || registerDto.getPassword().isEmpty()
       || registerDto.getName() == null || registerDto.getName().isEmpty()) {
