@@ -35,5 +35,6 @@ build/
 
 ### Resource files ###
 **/resources/*
+!**/resources/graphql/
 !**/resources/bot/
 
