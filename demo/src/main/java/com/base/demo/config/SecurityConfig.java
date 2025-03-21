@@ -21,6 +21,15 @@ public class SecurityConfig{
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+      
+      .sessionManagement(sessionManagement -> 
+        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+      )
+      .addFilterBefore(new SessionAuthenticationFilter(userDetailsService()), 
+      UsernamePasswordAuthenticationFilter.class)
+      .exceptionHandling(exceptionHandling ->
+        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint())
+      )
       .authorizeHttpRequests(authorizeRequests ->
       authorizeRequests
         .requestMatchers(
@@ -40,14 +49,6 @@ public class SecurityConfig{
       //   .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
       // .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
       .csrf().disable()
-      .sessionManagement(sessionManagement -> 
-        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-      )
-      .addFilterBefore(new SessionAuthenticationFilter(userDetailsService()), 
-      UsernamePasswordAuthenticationFilter.class)
-      .exceptionHandling(exceptionHandling ->
-        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint())
-      )
       .formLogin((formLogin) ->
       formLogin
         .usernameParameter("email")
