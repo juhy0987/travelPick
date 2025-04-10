@@ -9,3 +9,9 @@ def LocationSearchSchema(BaseModel):
   alias: Optional[str] = None
   coordinates: Optional[str] = None
   timezone: Optional[str] = None
+
+def ResortSearchSchema(BaseModel):
+  location_id: Optional[int] = None
+  name: Optional[str] = None
+  alias: Optional[str] = None
+  description: Optional[str] = None

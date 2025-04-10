@@ -12,3 +12,5 @@ test*.py
 
 test/
 resources/
+chroma/
+models/

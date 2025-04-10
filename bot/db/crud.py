@@ -10,9 +10,8 @@ class Transaction:
   def __init__(self, func):
     self.func = func
   
-  def __call__(self, *args, **kwargs):
+  def __call__(self, db, *args, **kwargs):
     try:
-      db = next(getDB())
       result = self.func(db, *args, **kwargs)
     except Exception as e:
       db.rollback()
@@ -20,11 +19,10 @@ class Transaction:
     finally:
       db.commit()
       db.refresh(result)
-      db.close()
     return result
   
 
-def get_location(db, location_id: int):
+def get_location(db, location_id: str):
   
   return _get_location(db, location_id)
 
@@ -36,8 +34,16 @@ def trace_route(db):
   
   return _trace_route(db)
 
+def get_resort(db, resort_id: str):
+  
+  return _get_resort(db, resort_id)
 
-def _get_location(db: Session, location_id: int):
+def search_resort(db, searchSchema: ResortSearchSchema):
+  
+  return _search_resort(db, searchSchema)
+
+
+def _get_location(db: Session, location_id: str):
   
   return db.query(Location) \
     .filter(Location.id == location_id) \
@@ -56,6 +62,26 @@ def _search_location(db: Session, searchSchema: LocationSearchSchema):
     query = query.filter(Location.coordinates == searchSchema.coordinates)
   if searchSchema.timezone:
     query = query.filter(Location.timezone == searchSchema.timezone)
+  
+  return query.all()
+
+def _get_resort(db: Session, resort_id: str):
+  
+  return db.query(Resort) \
+    .filter(Resort.id == resort_id) \
+    .first()
+
+def _search_resort(db: Session, searchSchema: ResortSearchSchema):
+  
+  query = db.query(Resort)
+  if searchSchema.location_id:
+    query = query.filter(Resort.location_id == searchSchema.location_id)
+  if searchSchema.name:
+    query = query.filter(Resort.name == searchSchema.name)
+  if searchSchema.alias:
+    query = query.filter(Resort.alias == searchSchema.alias)
+  if searchSchema.description:
+    query = query.filter(Resort.description == searchSchema.description)
   
   return query.all()
 
@@ -82,27 +108,18 @@ def _trace_route(db: Session):
 
 def _create_location(db: Session, location: Location):
   
-  target = db.query(Location) \
-    .filter(location.name == Location.name) \
-    .filter(location.parent_id == Location.parent_id) \
-    .first()
-  if target:
-    return target
-  
   db.add(location)
   return location
 
 def _create_resort(db: Session, resort: Resort):
   
-  target = db.query(Resort) \
-    .filter(resort.name == Resort.name) \
-    .filter(resort.location_id == Resort.location_id) \
-    .first()
-  if target:
-    return target
-  
   db.add(resort)
   return resort
+
+def _create_photo(db: Session, photo: Photo):
+  
+  db.add(photo)
+  return photo
 
 
 @Transaction
@@ -115,3 +132,7 @@ def create_resort(db: Session, resort: Resort):
   
   return _create_resort(db, resort)
 
+@Transaction
+def create_photo(db: Session, photo: Photo):
+  
+  return _create_photo(db, photo)

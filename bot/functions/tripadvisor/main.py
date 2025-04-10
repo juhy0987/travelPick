@@ -1,3 +1,4 @@
+import io
 import os
 import time
 import requests
@@ -5,12 +6,13 @@ import json
 from dotenv import load_dotenv
 from shapely.geometry import Point
 from geoalchemy2.shape import from_shape
+from PIL import Image
 
-from db.crud import *
+from db import crud, model, database
 
 from lib import chroma
 
-
+api_cnt = 0
 def get_location(location_id, language="ko"):
   API_KEY = os.getenv("API_KEY")
   
@@ -20,12 +22,14 @@ def get_location(location_id, language="ko"):
   try:
     time.sleep(0.1)
     response = requests.get(url, headers=headers)
+    api_cnt += 1
     return response.text
   except Exception as e:
     return ""
 
 def search_location(query, category="geos", language="ko"):
   API_KEY = os.getenv("API_KEY")
+  global api_cnt
   
   url = f"https://api.content.tripadvisor.com/api/v1/location/search?key={API_KEY}&searchQuery={query}&category={category}&language={language}"
   headers = {"accept": "application/json"}
@@ -33,9 +37,27 @@ def search_location(query, category="geos", language="ko"):
   try:
     time.sleep(0.1)
     response = requests.get(url, headers=headers)
+    api_cnt += 1
     return response.text
   except Exception as e:
     # raise e
+    return ""
+
+def get_image(location_id, offset=0, limit=None, language="ko"):
+  API_KEY = os.getenv("API_KEY")
+  global api_cnt
+  
+  url = f"https://api.content.tripadvisor.com/api/v1/location/{location_id}/photos?language={language}&currency=USD&key={API_KEY}&offset={offset}"
+  url += f"&limit={limit}" if limit else ""
+  headers = {"accept": "application/json"}
+  
+  try:
+    time.sleep(0.1)
+    response = requests.get(url, headers=headers)
+    api_cnt += 1
+    return response.text
+  except Exception as e:
+    print(str(e))
     return ""
 
 def parse_json(data):
@@ -49,6 +71,25 @@ def parse_json(data):
     return data
   else:
     return None
+
+def load_image(location_id, offset=0, limit=None):
+  data = parse_json(get_image(location_id, offset, limit))
+  if not data:
+    return [], 0
+  
+  next_offset = offset+len(data)
+  images = []
+  for image in data:
+    if "images" in image:
+      try:
+        time.sleep(0.1)
+        image_data = io.BytesIO(requests.get(image["images"]["large"]["url"]).content)
+        images.append(Image.open(image_data))
+      except Exception as e:
+        print(str(e))
+        pass
+  
+  return images, next_offset
 
 def file_read(file_path):
   with open(file_path, "r") as f:
@@ -72,7 +113,7 @@ def main():
   text_collection_name = "text"
   image_model_type="clip"
   image_collection_name = "image"
-  file_path = "resources/output.txt"
+  file_path = "../output.txt"
   
   text_store = chroma.VectorStore(os.getenv("LONGFORMER"), text_model_type, text_collection_name)
   image_store = chroma.VectorStore(os.getenv("CLIP"), image_model_type, image_collection_name)
@@ -82,7 +123,7 @@ def main():
   divider = get_division()
   reader = file_read(file_path)
   next(divider)
-  db = next(getDB())
+  db = next(database.getDB())
   
   cnt = 0
   while (line := next(reader)):
@@ -92,7 +133,7 @@ def main():
       continue
     
     for location in data:
-      tracer = trace_route(db)
+      tracer = crud.trace_route(db)
       next(tracer)
       
       address = location["address_obj"]
@@ -106,25 +147,30 @@ def main():
         
         address_obj.append((division, area))
       address_obj.sort()
+    
+      flag = False
       
-      address_obj.append((1e9, location["name"]))
-      flag = True
-      
-      for _, area in address_obj:
+      for i, v in enumerate(address_obj):
+        _, area = v
         if not tracer.send(area):
-          flag = False
+          flag = True
           break
         next(tracer)
       if flag:
-        cache[location["name"]] = location
         tracer.close()
         continue
       
-      next(tracer)
       parent = tracer.send(None)
 
+      if crud.search_location(db, model.Location(
+        name=location["name"],
+        parent_id=parent
+      )):
+        tracer.close()
+        continue
+        
       _location = parse_json(get_location(location["location_id"]))
-      location = create_location(Location(
+      location = crud.create_location(db, model.Location(
         parent_id=parent,
         name=_location["name"],
         alias=location["location_id"],
@@ -135,17 +181,34 @@ def main():
         timezone=_location["timezone"]
       ))
       # print(_location)
-      resort = create_resort(Resort(
+      resort = crud.create_resort(db, model.Resort(
         location_id=location.id,
         name=_location["name"],
         alias=_location["location_id"],
-        description=(_location["description"] if "description" in _location else _location["name"]),
+        description=(_location["description"] if "description" in _location else ""),
       ))
+      
+      text_store.store(
+        texts=[_location["name"]],
+        metas=[{"id": resort.id, 
+                "name": resort.name,
+                "type": "name", 
+                "parent": resort.id, 
+                "index": "name",
+                "count": 1
+        }]
+      )
       
       if "description" in _location:
         text_store.store(
           texts=[_location["description"]],
-          metas=[{"id": resort.id, "name": resort.name}]
+          metas=[{"id": resort.id+".description", 
+                  "name": resort.name,
+                  "type": "description", 
+                  "parent": resort.id, 
+                  "index": "name",
+                  "count": 1
+          }]
         )
       
       print(f"location: {location.name} -> resort: {resort}")

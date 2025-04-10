@@ -57,7 +57,6 @@ class Review(Base):
   content = Column(String, nullable=False)
   created = Column(DateTime, nullable=False)
   updated = Column(DateTime, nullable=False)
-  score = Column(Double, nullable=False)
   
   Index('resort_id')
   
@@ -72,7 +71,7 @@ class Photo(Base):
   resort_id = Column(String(36), ForeignKey('resort.id'), nullable=True)
   review_id = Column(String(36), ForeignKey('review.id'), nullable=True)
   data = Column(LargeBinary, nullable=False)
-  score = Column(Double, nullable=False)
+  ext = Column(String(255), nullable=False)
   
   Index('resort_id', 'review_id')
   
