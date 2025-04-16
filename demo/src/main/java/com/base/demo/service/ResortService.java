@@ -22,7 +22,6 @@ import com.base.demo.entity.Photo;
 import com.base.demo.entity.Resort;
 import com.base.demo.exception.ChromaException;
 import com.base.demo.repository.ChromaRepository;
-import com.base.demo.repository.LocationRepository;
 import com.base.demo.repository.PhotoRepository;
 import com.base.demo.repository.ResortRepository;
 import com.base.demo.utils.ImageSize;
@@ -32,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ResortService {
-  @Autowired
-  private LocationRepository locationRepository;
   @Autowired
   private ResortRepository resortRepository;
   @Autowired
