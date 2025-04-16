@@ -37,4 +37,5 @@ build/
 **/resources/*
 !**/resources/graphql/
 !**/resources/bot/
+application.properties
 
