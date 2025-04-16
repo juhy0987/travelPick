@@ -52,20 +52,19 @@ public class ResortService {
 
   public ResortDto getResort(Integer id) {
     Resort resort = resortRepository.findById(id).orElse(null);
-    System.out.println("passed");
     if (resort == null) {
       return null;
     }
-    System.out.println("passed2");
+
     List<Photo> photos = photoRepository.findAllByResortID(id);
     AtomicInteger index = new AtomicInteger(0);
     Collections.shuffle(photos);
-    System.out.println("!!!!!!!!!");
+
     List<PhotoDto> photoDtos = photos.stream()
       .limit(defaultThumbnailNum)
       .map(photo -> photo.toPhotoDto(index.getAndIncrement(), ImageSize.THUMBNAIL))
       .collect(Collectors.toList());
-    System.out.println("flag");
+
     return resort.toResortDto(photoDtos);
   }
 
