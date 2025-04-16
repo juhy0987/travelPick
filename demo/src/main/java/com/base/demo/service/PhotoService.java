@@ -36,13 +36,7 @@ public class PhotoService {
   }
 
   public List<PhotoDto> getPhotos(PhotoGetDto photoGetDto) {
-    System.out.println(photoGetDto.getResort_id());
-    Photo tmp = photoRepository.findById(0).orElse(null);
-    if (tmp == null)
-      return null;
-
     List<Photo> photos = photoRepository.findAllByResortID(photoGetDto.getResort_id());
-    System.out.println(photos.toString());
     AtomicInteger index = new AtomicInteger(photoGetDto.getOffset());
 
     int limit = (photoGetDto.getLimit() != null) ? photoGetDto.getLimit() : defaultImageNum;
