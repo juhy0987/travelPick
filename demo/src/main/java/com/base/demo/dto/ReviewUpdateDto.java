@@ -1,7 +1,6 @@
 package com.base.demo.dto;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.base.demo.entity.Resort;
 import com.base.demo.entity.Review;
@@ -17,9 +16,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReviewUpdateDto {
-  private UUID id;
+  private Integer id;
   private String content;
-  private List<UUID> delete_photos;
+  private List<Integer> delete_photos;
   private List<String> add_photos;
 
   public Review toReview(Resort resort, User user) {
@@ -28,7 +27,6 @@ public class ReviewUpdateDto {
       resort,
       user,
       this.content,
-      null,
       null,
       null
     );

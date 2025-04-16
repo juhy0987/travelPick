@@ -1,6 +1,6 @@
 package com.base.demo.dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import com.base.demo.entity.User;
 
@@ -20,7 +20,7 @@ public class UserDto {
   private String passHash;
   private String name;
   private String refreshToken;
-  private Date created;
+  private Timestamp created;
 
   public User toEntity() {
     return new User(

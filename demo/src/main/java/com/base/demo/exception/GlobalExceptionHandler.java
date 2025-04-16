@@ -8,6 +8,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +30,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.CONFLICT).body("Data Conflict: " + e.getMessage());
   }
 
+  @ExceptionHandler(ChromaException.class)
+  public ResponseEntity<String> chromaExceptionHandler(ChromaException e) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error: " + e.getMessage());
+  }
+
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
@@ -35,6 +42,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NullPointerException.class)
   public ResponseEntity<String> nullPointerExceptionHandler(NullPointerException e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
+  }
+
+  @ExceptionHandler(JsonProcessingException.class)
+  public ResponseEntity<String> jsonProcessingExceptionHandler(JsonProcessingException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
   }
 

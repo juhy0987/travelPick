@@ -1,11 +1,12 @@
 package com.base.demo.entity;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Entity
+@Table(name = "user")
 public class User implements Serializable{
   @Id
   private String email;
@@ -33,5 +35,5 @@ public class User implements Serializable{
   private String refreshToken;
 
   @Column
-  private Date created;
+  private Timestamp created;
 }

@@ -43,6 +43,9 @@ public class SecurityConfig{
           "/graphiql",
           "/graphql"
         ).permitAll()
+        .requestMatchers(
+          "/actuator/**"
+        ).permitAll()
         .anyRequest().authenticated()
       )
       // .csrf(csrf -> csrf

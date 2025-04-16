@@ -1,6 +1,6 @@
 package com.base.demo.dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -28,6 +28,6 @@ public class UserRegisterDto {
       passwordEncoder.encode(this.password),
       this.name,
       null,
-      new Date(System.currentTimeMillis()));
+      new Timestamp(System.currentTimeMillis()));
   }
 }

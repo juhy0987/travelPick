@@ -1,6 +1,6 @@
 package com.base.demo.controller;
 
-import java.util.UUID;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -24,7 +24,7 @@ public class ReviewGraphQLController {
   private ReviewService reviewService;
 
   @QueryMapping
-  public ReviewDto getReview(@Argument UUID id) {
+  public ReviewDto getReview(@Argument Integer id) {
     return reviewService.getReview(id);
   }
 
@@ -39,7 +39,7 @@ public class ReviewGraphQLController {
   }
 
   @QueryMapping
-  public String deleteReview(@Argument UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+  public String deleteReview(@Argument Integer id, @AuthenticationPrincipal UserDetails userDetails) {
     return reviewService.delete(id, userDetails);
   }
 }

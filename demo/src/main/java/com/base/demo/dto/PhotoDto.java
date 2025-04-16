@@ -1,6 +1,6 @@
 package com.base.demo.dto;
 
-import java.util.UUID;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PhotoDto {
-  private UUID id;
+  private Integer id;
   private String dataurl;
   private Integer index;
 }

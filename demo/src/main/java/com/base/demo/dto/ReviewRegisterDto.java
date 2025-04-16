@@ -2,7 +2,6 @@ package com.base.demo.dto;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 import com.base.demo.entity.Resort;
 import com.base.demo.entity.Review;
@@ -18,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReviewRegisterDto {
-  private UUID resort_id;
+  private Integer resort_id;
   private String content;
   private List<String> photos;
 
@@ -28,7 +27,6 @@ public class ReviewRegisterDto {
       resort,
       user,
       this.content,
-      0.0f,
       new Timestamp(System.currentTimeMillis()),
       null
     );

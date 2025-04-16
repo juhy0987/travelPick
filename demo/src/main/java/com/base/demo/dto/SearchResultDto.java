@@ -1,6 +1,5 @@
 package com.base.demo.dto;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -12,12 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ReviewDto {
+public class SearchResultDto {
   private Integer id;
-  private Integer resort_id;
-  private String user_id;
-  private String content;
-  private Date created;
-  private Date updated;
+  private String name;
+  private String description;
+  private LocationDto ancestor;
   private List<PhotoDto> photos;
+  double similarity;
 }
+

@@ -1,20 +1,21 @@
-scalar UUID
 scalar Date
 
 type Query {
   hello: String
 
-  getResort(id: UUID!): ResortDto
-  searchResorts(searchDto: SearchDto!): [ResortDto]
+  getLocation(id: Int!): LocationDto
+
+  getResort(id: Int!): ResortDto
+  searchResorts(searchDto: SearchDto!): [SearchResultDto]
   autoComplete(query: String!): [AutoCompleteDto]
 
-  getPhoto(id: UUID!): PhotoDto
-  getPhotos(resort_id: UUID!, offset: Int!, limit: Int): [PhotoDto]
+  getPhoto(id: Int!): PhotoDto
+  getPhotos(photoGetDto: PhotoGetDto!): [PhotoDto]
 
-  getReview(id: UUID!): ReviewDto
+  getReview(id: Int!): ReviewDto
   createReview(reviewRegisterDto: ReviewRegisterDto!): ReviewDto
   updateReview(reviewUpdateDto: ReviewUpdateDto!): ReviewDto
-  deleteReview(id: UUID!): String
+  deleteReview(id: Int!): String
 }
 
 type Mutation {
@@ -22,32 +23,42 @@ type Mutation {
 }
 
 type AutoCompleteDto {
-  id: UUID!
+  id: Int!
   name: String!
   similarity: Int !
   thumbnail: String
 }
 
 type LocationDto {
-  id: UUID!
+  id: Int!
   name: String!
-  coordinates: Point!
+  latitude: Float!
+  longitude: Float!
   timezone: String
   parent: LocationDto
 }
 
 type ResortDto {
-  id: UUID!
+  id: Int!
   name: String!
   description: String
   ancestor: LocationDto
   photos: [PhotoDto]
 }
 
+type SearchResultDto {
+  id: Int!
+  name: String!
+  description: String
+  ancestor: LocationDto
+  photos: [PhotoDto]
+  similarity: Float
+}
+
 type ReviewDto {
-  id: UUID!
-  resort_id: UUID
-  user_id: String
+  id: Int!
+  resort_id: Int
+  user_id: Int
   content: String
   created: Date
   updated: Date
@@ -55,14 +66,9 @@ type ReviewDto {
 }
 
 type PhotoDto {
-  id: UUID!
+  id: Int!
   dataurl: String!
   index: Int!
-}
-
-type Point {
-  latitude: Float!
-  longitude: Float!
 }
 
 
@@ -72,20 +78,20 @@ input SearchDto {
 }
 
 input PhotoGetDto {
-  resort_id: UUID!
+  resort_id: Int!
   offset: Int!
   limit: Int
 }
 
 input ReviewRegisterDto {
-  resort_id: UUID!
+  resort_id: Int!
   content: String!
   photos: [String]
 }
 
 input ReviewUpdateDto {
-  id: UUID!
+  id: Int!
   content: String
-  delete_photos: [UUID]
+  delete_photos: [Int]
   add_photos: [String]
 }

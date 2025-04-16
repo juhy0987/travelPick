@@ -1,8 +1,6 @@
 package com.base.demo.dto;
 
-import java.util.UUID;
 
-import org.springframework.data.geo.Point;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,9 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LocationDto {
-  private UUID id;
+  private Integer id;
   private String name;
-  private Point coordinates;
+  private Double latitude;
+  private Double longitude;
   private String timezone;
   private LocationDto parent;
 }

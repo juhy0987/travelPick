@@ -1,7 +1,6 @@
 package com.base.demo.service;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class ReviewService {
 
 
 
-  public ReviewDto getReview(UUID id) {
+  public ReviewDto getReview(Integer id) {
     Review review = reviewRepository.findById(id).orElse(null);
     if (review == null) {
       return null;
@@ -122,7 +121,7 @@ public class ReviewService {
     );
   }
 
-  public String delete(UUID id, UserDetails userDetails) {
+  public String delete(Integer id, UserDetails userDetails) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     if (user == null) {
       throw new AuthenticationException("User not found") {};

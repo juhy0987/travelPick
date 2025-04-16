@@ -2,7 +2,6 @@ package com.base.demo.entity;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 import com.base.demo.dto.PhotoDto;
 import com.base.demo.dto.ReviewDto;
@@ -14,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,10 +28,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @Entity
+@Table(name = "review")
 public class Review {
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
   @ManyToOne
   @JoinColumn(name = "resort_id")
@@ -43,9 +44,6 @@ public class Review {
 
   @Column
   private String content;
-
-  @Column(nullable=true)
-  private Float score;
 
   @Column(nullable=true)
   private Timestamp created;
@@ -70,10 +68,6 @@ public class Review {
     boolean flag = false;
     if (review.getContent() != null) {
       this.content = review.getContent();
-      flag = true;
-    }
-    if (review.getScore() != null) {
-      this.score = review.getScore();
       flag = true;
     }
     
