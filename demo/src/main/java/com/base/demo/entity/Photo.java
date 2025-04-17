@@ -2,7 +2,6 @@ package com.base.demo.entity;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
@@ -16,7 +15,6 @@ import org.hibernate.engine.jdbc.BlobProxy;
 import com.base.demo.dto.PhotoDto;
 import com.base.demo.utils.ImageSize;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +26,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
