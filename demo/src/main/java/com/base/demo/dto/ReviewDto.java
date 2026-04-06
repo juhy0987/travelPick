@@ -1,6 +1,6 @@
 package com.base.demo.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -15,9 +15,9 @@ import lombok.Setter;
 public class ReviewDto {
   private Integer id;
   private Integer resort_id;
-  private String user_id;
+  private UserViewDto user;
   private String content;
-  private Date created;
-  private Date updated;
+  private LocalDateTime created;
+  private LocalDateTime updated;
   private List<PhotoDto> photos;
 }

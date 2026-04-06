@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
@@ -64,16 +65,17 @@ public class Photo {
   private Timestamp created;
 
   public Photo(Resort resort, Review review, String dataurl) {
-    String[] parts = dataurl.split(",");
-    this.ext = parts[0].split("/")[1].split(";")[0];
-    this.data = BlobProxy.generateProxy(parts[1].getBytes());
+    String[] parts = dataurl.split(",", 2);
+    // System.out.println("parts: " + Arrays.toString(parts));
+    this.ext = parts[0].split("/", 2)[1].split(";", 2)[0];
+    this.data = BlobProxy.generateProxy(Base64.getDecoder().decode(parts[1]));
     this.resort = resort;
     this.review = review;
     this.created = new Timestamp(System.currentTimeMillis());
   }
 
   public String getDataURL(ImageSize size) {
-    return "data:image/" + ext + ";base64," + new String(resizeImage(size));
+    return "data:image/" + ext + ";base64," + Base64.getEncoder().encodeToString(resizeImage(size));
   }
 
   public String getDataURL() {

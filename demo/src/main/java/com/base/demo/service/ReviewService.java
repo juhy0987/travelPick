@@ -1,7 +1,9 @@
 package com.base.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +22,7 @@ import com.base.demo.repository.ResortRepository;
 import com.base.demo.repository.ReviewRepository;
 import com.base.demo.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,7 +44,7 @@ public class ReviewService {
     if (review == null) {
       return null;
     }
-
+    
     AtomicInteger index = new AtomicInteger(0);
 
     return review.toReviewDto(
@@ -52,7 +55,31 @@ public class ReviewService {
     );
   }
 
+  public List<ReviewDto> getReviews(Integer resort_id) {
+    List<Review> reviews = reviewRepository.findAllByResortID(resort_id);
+    if (reviews == null) {
+      return null;
+    }
+
+    AtomicInteger index = new AtomicInteger(0);
+
+    return reviews.stream()
+      .map(review -> review.toReviewDto(
+        photoRepository.findAllByReviewID(review.getId())
+          .stream()
+          .map(photo -> photo.toPhotoDto(index.getAndIncrement()))
+          .toList()
+      ))
+      .collect(Collectors.toList());
+  }
+
+  @Transactional
   public ReviewDto createReview(ReviewRegisterDto reviewRegisterDto, UserDetails userDetails) {
+    System.out.println("UserDetails: " + userDetails);
+    if (userDetails == null) {
+      throw new AuthenticationException("User not authenticated") {};
+    }
+
     User user = userRepository.findByEmail(userDetails.getUsername());
     if (user == null) {
       throw new AuthenticationException("User not found") {};
@@ -69,18 +96,34 @@ public class ReviewService {
     List<Photo> photos = reviewRegisterDto.getPhotos()
       .stream()
       .map(dataurl -> {
+        if (dataurl == null || dataurl.isEmpty()) {
+          return null;
+        }
         return new Photo(resort, review, dataurl);
       })
-      .toList();
-    photoRepository.saveAll(photos);
-    return review.toReviewDto(
-      photos.stream()
+      .collect(Collectors.toCollection(ArrayList::new));
+
+    photos.removeIf(photo -> photo == null);
+    if (!photos.isEmpty()) {
+      photoRepository.saveAll(photos);
+
+      return review.toReviewDto(
+        photos.stream()
         .map(photo -> photo.toPhotoDto(index.getAndIncrement()))
         .toList()
+      );
+    }
+    return review.toReviewDto(
+      List.of()
     );
   }
 
+  @Transactional
   public ReviewDto updateReview(ReviewUpdateDto reviewUpdateDto, UserDetails userDetails) {
+    if (userDetails == null) {
+      throw new AuthenticationException("User not authenticated") {};
+    }
+
     User user = userRepository.findByEmail(userDetails.getUsername());
     if (user == null) {
       throw new AuthenticationException("User not found") {};
@@ -122,6 +165,10 @@ public class ReviewService {
   }
 
   public String delete(Integer id, UserDetails userDetails) {
+    if (userDetails == null) {
+      throw new AuthenticationException("User not authenticated") {};
+    }
+
     User user = userRepository.findByEmail(userDetails.getUsername());
     if (user == null) {
       throw new AuthenticationException("User not found") {};

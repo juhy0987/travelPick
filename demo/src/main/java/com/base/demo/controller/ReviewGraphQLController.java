@@ -2,6 +2,8 @@ package com.base.demo.controller;
 
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -26,6 +28,11 @@ public class ReviewGraphQLController {
   @QueryMapping
   public ReviewDto getReview(@Argument Integer id) {
     return reviewService.getReview(id);
+  }
+
+  @QueryMapping
+  public List<ReviewDto> getReviews(@Argument Integer resort_id) {
+    return reviewService.getReviews(resort_id);
   }
 
   @MutationMapping

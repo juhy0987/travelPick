@@ -24,7 +24,7 @@ def parse_dataurl(dataurl):
     format, dataurl = dataurl.split(";", 1)
     return base64_to_image(dataurl.split(",")[1], format)
   except Exception as e:
-    print(e)
+    print(f"Error during parsing dataurl: {str(e)}")
     return None
 
 def normalize_vector(vector):

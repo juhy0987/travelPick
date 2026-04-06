@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.base.demo.dto.SearchDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,10 +49,9 @@ public class ChromaRepository{
     }
   }
 
-  public List<Map<String, String>> search(SearchDto searchDto) throws Exception{
-    String url = PYTHON_SERVER_HOST + PYTHON_SERVER_PORT + "/api/search";
+  public List<Map<String, Object>> search(SearchDto searchDto) throws Exception{
+    String url = PYTHON_SERVER_HOST + ":" + PYTHON_SERVER_PORT + "/api/search";
     String requestBodyJson = objectMapper.writeValueAsString(searchDto.toMap());
-
     HttpRequest request = HttpRequest.newBuilder()
       .uri(new URI(url))
       .header("Content-Type", "application/json")
@@ -62,8 +62,9 @@ public class ChromaRepository{
     if (response.statusCode() != 200) {
       throw new RuntimeException("Failed to search data: " + response.body());
     }
-
-    List<Map<String, String>> result = objectMapper.readValue(response.body(), List.class);
+    
+    Map<String, Object> body = objectMapper.readValue(response.body(), new TypeReference<Map<String, Object>>() {});
+    List<Map<String, Object>> result = (List<Map<String, Object>>) body.get("result");
     return result;
   }
 }

@@ -4,6 +4,7 @@ package com.base.demo.entity;
 import org.locationtech.jts.geom.Point;
 
 import com.base.demo.dto.LocationDto;
+import com.base.demo.dto.LocationSearchResponseDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,10 +54,22 @@ public class Location {
     return new LocationDto(
       id,
       name,
-      coordinates.getX(),
       coordinates.getY(),
+      coordinates.getX(),
       timezone,
       parent != null ? parent.toLocationDto() : null
+    );
+  }
+
+  public LocationSearchResponseDto toLocationSearchResponseDto(Integer similarity) {
+    return new LocationSearchResponseDto(
+      id,
+      name,
+      parent != null ? parent.toLocationDto() : null,
+      coordinates.getY(),
+      coordinates.getX(),
+      timezone,
+      similarity
     );
   }
 }

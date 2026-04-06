@@ -4,6 +4,7 @@ type Query {
   hello: String
 
   getLocation(id: Int!): LocationDto
+  searchLocations(locationSearchDto: LocationSearchDto!): [LocationSearchResponseDto]
 
   getResort(id: Int!): ResortDto
   searchResorts(searchDto: SearchDto!): [SearchResultDto]
@@ -13,13 +14,24 @@ type Query {
   getPhotos(photoGetDto: PhotoGetDto!): [PhotoDto]
 
   getReview(id: Int!): ReviewDto
-  createReview(reviewRegisterDto: ReviewRegisterDto!): ReviewDto
+  getReviews(resort_id: Int!): [ReviewDto]
+}
+
+type Mutation {
+  createLocation(locationRegisterDto: LocationRegisterDto!): LocationDto
+  createResort(resortRegisterDto: ResortRegisterDto!): ResortDto
+  
+  deletePhoto(id: Int!): Boolean
+
+  createReview(reviewRegisterDto: ReviewRegisterDto): ReviewDto
   updateReview(reviewUpdateDto: ReviewUpdateDto!): ReviewDto
   deleteReview(id: Int!): String
 }
 
-type Mutation {
-  createReview(reviewDto: ReviewRegisterDto): ReviewDto
+type UserViewDto {
+  email: String!
+  name: String!
+  created: Date
 }
 
 type AutoCompleteDto {
@@ -36,6 +48,16 @@ type LocationDto {
   longitude: Float!
   timezone: String
   parent: LocationDto
+}
+
+type LocationSearchResponseDto {
+  id: Int!
+  name: String!
+  parent: Int
+  latitude: Float!
+  longitude: Float!
+  timezone: String!
+  similarity: Int!
 }
 
 type ResortDto {
@@ -58,7 +80,7 @@ type SearchResultDto {
 type ReviewDto {
   id: Int!
   resort_id: Int
-  user_id: Int
+  user: UserViewDto
   content: String
   created: Date
   updated: Date
@@ -71,10 +93,32 @@ type PhotoDto {
   index: Int!
 }
 
+input LocationSearchDto {
+  query: String!
+  count: Int
+}
+
+input LocationRegisterDto {
+  name: String!
+  parent_id: Int
+  latitude: Float!
+  longitude: Float!
+  timezone: String!
+}
 
 input SearchDto {
   query: String
   dataurls: [String]
+  count: Int
+}
+
+input ResortRegisterDto {
+  name: String!
+  parent_id: Int
+  description: String
+  latitude: Float!
+  longitude: Float!
+  timezone: String!
 }
 
 input PhotoGetDto {

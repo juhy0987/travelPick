@@ -12,16 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.base.demo.dto.AutoCompleteDto;
 import com.base.demo.dto.PhotoDto;
 import com.base.demo.dto.ResortDto;
+import com.base.demo.dto.ResortRegisterDto;
 import com.base.demo.dto.SearchDto;
 import com.base.demo.dto.SearchResultDto;
+import com.base.demo.entity.Location;
 import com.base.demo.entity.Photo;
 import com.base.demo.entity.Resort;
 import com.base.demo.exception.ChromaException;
 import com.base.demo.repository.ChromaRepository;
+import com.base.demo.repository.LocationRepository;
 import com.base.demo.repository.PhotoRepository;
 import com.base.demo.repository.ResortRepository;
 import com.base.demo.utils.ImageSize;
@@ -31,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ResortService {
+  @Autowired
+  private LocationRepository locationRepository;
   @Autowired
   private ResortRepository resortRepository;
   @Autowired
@@ -82,10 +88,10 @@ public class ResortService {
 
   public List<SearchResultDto> searchResorts(SearchDto searchDto) throws ChromaException {
     try {
-      List<Map<String, String>> results = chromaRepository.search(searchDto);
+      List<Map<String, Object>> results = chromaRepository.search(searchDto);
       return results.stream()
       .map(result -> {
-        int id = Integer.parseUnsignedInt(result.get("id"));
+        int id = Integer.parseUnsignedInt((String) result.get("id"));
         Resort resort = resortRepository.findById(id).orElse(null);
         if (resort == null)
           return null;
@@ -95,20 +101,31 @@ public class ResortService {
           .stream()
           .map(photo -> photo.toPhotoDto(index.getAndIncrement(), ImageSize.THUMBNAIL))
           .collect(Collectors.toList());
-        return resort.toSearchResultDto(photoDtos, Double.parseDouble(result.get("score")));
+        return resort.toSearchResultDto(photoDtos, (Double) result.get("score"));
       })
       .collect(Collectors.toList());
     } catch (Exception e) {
-      throw new ChromaException("Chroma server error", e);
+      throw new ChromaException("Chroma server error: " + e.toString(), e);
     }
     
 
     
   }
 
-  public ResortDto createResort(ResortDto resortDto) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'createResort'");
+  @Transactional
+  public ResortDto createResort(ResortRegisterDto resortRegisterDto) {
+    Location parent = locationRepository.findById(resortRegisterDto.getParent_id())
+      .orElseThrow(() -> new IllegalStateException("Location not found"));
+    
+    Location location = locationRepository.save(resortRegisterDto.toLocation(parent));
+    if (location == null) {
+      throw new IllegalStateException("Failed to save location");
+    }
+    Resort resort = resortRepository.save(resortRegisterDto.toResort(location));
+    if (resort == null) {
+      throw new IllegalStateException("Failed to save resort");
+    }
+    return resort.toResortDto(Collections.emptyList());
   }
 
   

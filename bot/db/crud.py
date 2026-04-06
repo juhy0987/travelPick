@@ -136,3 +136,17 @@ def create_resort(db: Session, resort: Resort):
 def create_photo(db: Session, photo: Photo):
   
   return _create_photo(db, photo)
+
+def get_photo(db: Session, photo_id: str):
+  return db.query(Photo) \
+    .filter(Photo.id == photo_id) \
+    .first()
+
+def get_photos(db: Session, resort_id: str):
+  return db.query(Photo) \
+    .filter(Photo.resort_id == resort_id) \
+    .all()
+
+def get_all_photos(db: Session):
+  return db.query(Photo) \
+    .all()

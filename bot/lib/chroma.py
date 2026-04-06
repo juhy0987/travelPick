@@ -59,23 +59,7 @@ class VectorStore:
   
   # def store(self, objs=[], metas=[], func=None):
   def store(self, texts=None, images=None, metas=[], func=None):
-    # if not objs:
-    #   return [], []
-    # if len(objs) != len(metas):
-    #   raise ValueError("Length of objs and metas must be the same.")
-    
-    # texts = None
-    # images = None
-    
-    # if isinstance(objs[0], str):
-    #   texts = objs
-    # elif isinstance(objs[0], Image.Image):
-    #   images = objs
-    # else:
-    #   raise ValueError("Invalid object type.")
-      
     embeds, docs = self.model.encode(texts=texts, images=images)
-    print(embeds)
     metadatas = metas
     
     self.collection.add(

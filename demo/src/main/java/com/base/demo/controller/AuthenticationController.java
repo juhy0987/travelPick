@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.base.demo.dto.LoginDto;
 import com.base.demo.dto.UserRegisterDto;
+import com.base.demo.dto.UserViewDto;
 import com.base.demo.entity.User;
 import com.base.demo.service.UserService;
 
@@ -26,33 +27,36 @@ public class AuthenticationController {
   private UserService userService;
 
   @PostMapping("/login")
-  public ResponseEntity<String> login(
+  public ResponseEntity<UserViewDto> login(
     @RequestBody LoginDto loginDto,
     HttpSession session) {
     User user = userService.authenticate(loginDto);
     session.setAttribute("user", user);
-    
-    return ResponseEntity.status(HttpStatus.OK).body("Login successful");
+    System.out.println("User: " + user);
+    System.out.println("Session: " + session.getAttribute("user"));
+    return ResponseEntity.status(HttpStatus.OK).body(user.toUserViewDto());
   }
 
   @PostMapping("/register")
-  public ResponseEntity<String> register(
+  public ResponseEntity<UserViewDto> register(
     @RequestBody UserRegisterDto registerDto,
     HttpSession session) {
     User user = userService.register(registerDto);
     session.setAttribute("user", user);
     
-    return ResponseEntity.status(HttpStatus.CREATED).body("Registration successful");
+    return ResponseEntity.status(HttpStatus.CREATED).body(user.toUserViewDto());
   }
 
   @GetMapping("")
   public ResponseEntity<String> check(HttpSession session) {
+    User user = (User) session.getAttribute("user");
+    System.out.println(user);
     return ResponseEntity.status(HttpStatus.OK).body("Authorized");
   }
 
-  @DeleteMapping("")
+  @DeleteMapping("/logout")
   public ResponseEntity<String> logout(HttpSession session) {
-    session.invalidate();
+    session.invalidate(); 
     return ResponseEntity.status(HttpStatus.OK).body("Logged out");
   }
 

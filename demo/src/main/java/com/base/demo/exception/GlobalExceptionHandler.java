@@ -35,6 +35,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error: " + e.getMessage());
   }
 
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<String> illegalStateExceptionHandler(IllegalStateException e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());
+  }
+
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + e.getMessage());

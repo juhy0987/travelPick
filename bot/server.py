@@ -40,58 +40,70 @@ def index():
 @app.route('/api/search', methods=['POST'])
 def search():
   data = request.json
-  search_query = data.get('query')
-  if not search_query:
+  if not data:
     return jsonify({'error': 'No query provided'}), 400
   
-  query = search_query.get('query')
-  cnt = search_query.get('cnt')
-  dataurls = search_query.get('dataurls')
+  query = data.get('query')
+  cnt = data.get('cnt')
+  dataurls = data.get('dataurls')
+  if isinstance(dataurls, str):
+    dataurls = [dataurls]
   images = [utils.parse_dataurl(dataurl) for dataurl in dataurls] if dataurls else []
   
   if query:
     text_results = text_store.search(query, 
-                                count=int(cnt) if cnt else 10)
+                                n=int(cnt) if cnt else 10)
     image_results = image_store.search(query,
-                                      count=int(cnt) if cnt else 10)
+                                n=int(cnt) if cnt else 10)
   else:
     text_results = {'ids': [], 'metadatas': [], 'documents': []}
     image_results = image_store.search(images, 
-                                  count=int(cnt) if cnt else 10,
+                                  n=int(cnt) if cnt else 10,
                                   query_type="image")
   
   result = {}
-  for i, v in enumerate(zip(text_results['ids'], text_results['metadatas'], text_results['documents'])):
-    id, metadata, document = v
-    parent = metadata.get('parent')
-    if not parent:
-      continue
-      
-    if not result.get(parent):
-      result[parent] = {
-        "sum": 0.0,
-        "cnt": 0,
-      }
-      
-    result[parent]["sum"] += 0.5^(result[parent]["cnt"]+1) * search_parameter[i]
-    result[parent]["cnt"] += 1
+  if text_results['ids']:
+    for i, v in enumerate(zip(
+      text_results['ids'][0], 
+      text_results['metadatas'][0], 
+      text_results['documents'][0]
+    )):
+      id, metadata, document = v
+      parent = metadata.get('parent')
+      if not parent:
+        continue
+      if not result.get(parent):
+        result[parent] = {
+          "sum": 0.0,
+          "cnt": 0,
+        }
+      weight = 0.5**(result[parent]["cnt"]+1)
+      result[parent]["sum"] += weight * search_parameter[i]
+      result[parent]["cnt"] += 1
   
-  for i, v in enumerate(zip(image_results['ids'], image_results['metadatas'], image_results['documents'])):
-    id, metadata, document = v
-    parent = metadata.get('parent')
-    if not parent:
-      continue
+  if image_results['ids']:
+    for i, v in enumerate(zip(
+      image_results['ids'][0], 
+      image_results['metadatas'][0], 
+      image_results['documents'][0]
+    )):
+      id, metadata, document = v
+      if metadata and \
+        not (parent := metadata.get('parent')) and \
+        not (parent := metadata.get('resort_id')):
+        continue
+        
+      if not result.get(parent):
+        result[parent] = {
+          "sum": 0.0,
+          "cnt": 0,
+        }
       
-    if not result.get(parent):
-      result[parent] = {
-        "sum": 0.0,
-        "cnt": 0,
-      }
-      
-    result[parent]["sum"] += 0.5^(result[parent]["cnt"]+1) * search_parameter[i]
-    result[parent]["cnt"] += 1
+      weight = 0.5**(result[parent]["cnt"]+1)
+      result[parent]["sum"] += weight * search_parameter[i]
+      result[parent]["cnt"] += 1
   
-  result = sorted([{"id": key, "score": value["sum"]} for key, value in result.items()], key=lambda x: x[1], reverse=True)
+  result = sorted([{"id": key, "score": value["sum"]} for key, value in result.items()], key=lambda x: x["score"], reverse=True)
   return jsonify({"result": result}), 200
       
 

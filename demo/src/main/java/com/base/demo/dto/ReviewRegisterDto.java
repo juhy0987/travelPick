@@ -1,6 +1,6 @@
 package com.base.demo.dto;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.base.demo.entity.Resort;
@@ -27,7 +27,7 @@ public class ReviewRegisterDto {
       resort,
       user,
       this.content,
-      new Timestamp(System.currentTimeMillis()),
+      LocalDateTime.now(),
       null
     );
   }

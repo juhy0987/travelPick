@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 
 import com.base.demo.dto.AutoCompleteDto;
 import com.base.demo.dto.ResortDto;
+import com.base.demo.dto.ResortRegisterDto;
 import com.base.demo.dto.SearchDto;
 import com.base.demo.dto.SearchResultDto;
 import com.base.demo.exception.ChromaException;
@@ -46,7 +47,7 @@ public class ResortGraphQLController {
   }
 
   @MutationMapping
-  public ResortDto createResort(@Argument ResortDto resortDto) {
-    return resortService.createResort(resortDto);
+  public ResortDto createResort(@Argument ResortRegisterDto resortRegisterDto) {
+    return resortService.createResort(resortRegisterDto);
   }
 }

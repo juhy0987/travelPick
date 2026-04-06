@@ -3,6 +3,8 @@ package com.base.demo.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import com.base.demo.dto.UserViewDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -36,4 +38,12 @@ public class User implements Serializable{
 
   @Column
   private Timestamp created;
+
+  public UserViewDto toUserViewDto() {
+    return new UserViewDto(
+      email,
+      name,
+      created
+    );
+  }
 }

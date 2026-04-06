@@ -1,6 +1,8 @@
 package com.base.demo.entity;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.base.demo.dto.PhotoDto;
@@ -46,20 +48,20 @@ public class Review {
   private String content;
 
   @Column(nullable=true)
-  private Timestamp created;
+  private LocalDateTime created;
 
   @Column(nullable=true,
           columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-  private Timestamp updated;
+  private LocalDateTime updated;
 
   public ReviewDto toReviewDto(List<PhotoDto> photos) {
     return new ReviewDto(
-      this.id,
-      this.resort.getId(),
-      this.user.getEmail(),
-      this.content,
-      this.created,
-      this.updated,
+      id,
+      resort.getId(),
+      user.toUserViewDto(),
+      content,
+      created,
+      updated,
       photos
     );
   }
@@ -72,7 +74,7 @@ public class Review {
     }
     
     if (flag) {
-      this.updated = new Timestamp(System.currentTimeMillis());
+      updated = LocalDateTime.now();
     }
   }
 }

@@ -47,4 +47,15 @@ public class PhotoService {
       .map(photo -> photo.toPhotoDto(index.getAndIncrement()))
       .collect(Collectors.toList());
   }
+
+  @Transactional
+  public boolean deletePhoto(Integer id) {
+    try {
+      photoRepository.deleteById(id);
+      return true;
+    } catch (Exception e) {
+      log.error("Error deleting photo with id {}: {}", id, e.getMessage());
+      return false;
+    }
+  }
 }
